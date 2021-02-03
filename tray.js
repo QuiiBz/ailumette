@@ -1,6 +1,8 @@
 const readline = require('readline');
 let cols, rows, turn, matches;
 
+const MAX_MATCHES = 3;
+
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -58,13 +60,19 @@ const nextTurn = async() => {
 
     let line = await getInput('Line');
 
-    while(!matches[line - 1].includes('|'))
+    while(!matches[line - 1].includes('|')) {
+    
+        console.log('Please insert a valid line number.');
         line = await getInput('Line');
+    }
 
     let match = await getInput('Matches', line);
 
-    while(!matches[line - 1].includes('|'.repeat(match)))
+    while(!matches[line - 1].includes('|'.repeat(match)) || match > MAX_MATCHES) {
+
+        console.log('Please insert a valid number of matches.');
         match = await getInput('Matches', line);
+    }
 
     console.log(`${isAITurn() ? 'AI' : 'You'} removed ${match} match(es) from line ${line}`);
 
@@ -92,20 +100,20 @@ const getInput = (input, aiLine) => {
                 if(aiLine) {
 
                     const line = matches[aiLine - 1];
-                    let match = Math.floor(Math.random() * 2) + 1;
+                    let match = Math.floor(Math.random() * MAX_MATCHES) + 1;
 
                     while(!line.includes('|'.repeat(match)))
-                        match = Math.floor(Math.random() * 2) + 1;
+                        match = Math.floor(Math.random() * MAX_MATCHES) + 1;
 
                     resolve(match);
 
                 } else {
                     // Find a line
 
-                    let line = Math.floor(Math.random() * 4);
+                    let line = Math.floor(Math.random() * matches.length) + 1;
 
-                    while(!matches[line - 1])
-                        line = Math.floor(Math.random() * 4);
+                    while(/^\s*$/.test(matches[line - 1]))
+                        line = Math.floor(Math.random() * matches.length) + 1;
 
                     resolve(line);
                 }
